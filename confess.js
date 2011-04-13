@@ -8,7 +8,6 @@ var confess = {
             {name:'ua', def:phantom.userAgent, req:false, desc:"the user-agent used to request the app"},
             {name:'task', def:'manifest', req:false, desc:"the task to be performed (currently only 'manifest')"}
         ])) {
-            console.log('what?');
             phantom.exit();
             return;
         }
@@ -110,9 +109,7 @@ phantom.utils = {
 
     load: function (url, ua, pre, post, scope) {
         if (!phantom.state) {
-            if (ua) {
-                phantom.userAgent = ua;
-            }
+            phantom.userAgent = ua;
             phantom.state = true;
             pre.apply(scope);
             phantom.open(url);
