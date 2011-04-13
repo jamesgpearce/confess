@@ -11,7 +11,7 @@ For example...
 
     > phantomjs confess.js http://functionsource.com
 
-...will write, to stoud:
+...will write, to stdoud:
 
     CACHE MANIFEST
 
@@ -78,8 +78,8 @@ PhantomJS' WebKit string. <code>TASK</code> is the type of analysis you'd like
 confess.js to perform, but right now it can only be <code>'manifest'</code>, the
 default.
 
-The results go to standard out, but of course you can pipe it to a file. If you
-want to create a cache manifest for an app, this is typically called
+The results go to stdout, but of course you can pipe it to a file. If you want
+to create a cache manifest for an app, this is typically called
 <code>app.manifest</code>:
 
     > phantomjs confess.js http://functionsource.com > app.manifest
