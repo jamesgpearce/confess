@@ -1,8 +1,11 @@
 # confess.js
 
-A small script library that uses [PhantomJS](http://www.phantomjs.org/) to headlessly analyze web pages.
+A small script library that uses [PhantomJS](http://www.phantomjs.org/) to
+headlessly analyze web pages.
 
-One useful application of this is to enumerate a web app's resources for the purposes of creating a cache manifest file to make your apps run offline. So useful that, right now, that's the only behavior.
+One useful application of this is to enumerate a web app's resources for the
+purposes of creating a cache manifest file to make your apps run offline. So
+useful that, right now, that's the only behavior.
 
 For example...
 
@@ -55,28 +58,43 @@ For example...
     NETWORK:
     *
 
-You can also set the user-agent header of the request made by PhantomJS to request the page, in case you're serving mobile apps off similar entry-point URLs to your desktop content.
+You can also set the user-agent header of the request made by PhantomJS to
+request the page, in case you're serving mobile apps off similar entry-point
+URLs to your desktop content.
 
 ## Installation & usage
 
-The one and only dependency is [PhantomJS](http://www.phantomjs.org/). Install this, and ensure it's running by trying out some of its example scripts.
+The one and only dependency is [PhantomJS](http://www.phantomjs.org/). Install
+this, and ensure it's all good by trying out some of its example scripts.
 
-Then, assuming <code>phantomjs</code> is on your path, and from the directory containing <code>confess.js</code>, run tasks with:
+Then, assuming <code>phantomjs</code> is on your path, and from the directory
+containing <code>confess.js</code>, run tasks with:
 
     > phantomjs confess.js URL [UA [TASK]]
 
-Where <code>URL</code> is mandatory, and points to the app you're analyzing. <code>UA</code> is the user-agent you'd like to use, and which defaults to PhantomJS' WebKit string. <code>TASK</code> is the type of analysis you'd like confess.js to perform, but right now it can only be <code>manifest</code>, the default.
+Where <code>URL</code> is mandatory, and points to the app you're analyzing.
+<code>UA</code> is the user-agent you'd like to use, and which defaults to
+PhantomJS' WebKit string. <code>TASK</code> is the type of analysis you'd like
+confess.js to perform, but right now it can only be <code>'manifest'</code>, the
+default.
 
-The results go to standard out, but of course you can pipe it to a file. If you want to create a cache manifest for an app, this is typically called <code>app.manifest</code>:
+The results go to standard out, but of course you can pipe it to a file. If you
+want to create a cache manifest for an app, this is typically called
+<code>app.manifest</code>:
 
     > phantomjs confess.js http://functionsource.com > app.manifest
 
-You would then need to attach add this file to your app, and reference the manifest in the <code>html</code> element:
+You would then need to attach add this file to your app, and reference the
+manifest in the <code>html</code> element:
 
     <!DOCTYPE html>
     <html manifest="app.manifest">
         <head>
 
-(And ensure that the manifest file gets emitted from your web server with a content type of <code>text/cache-manifest</code>.)
+(And ensure that the manifest file gets emitted from your web server with a
+content type of <code>text/cache-manifest</code>.)
 
-Note that if your app has any errors, or produces any console output of its own, this will also appear in the upper part of the manifest. You may need to edit the file manually to remove that, otherwise you'll probably end up with an invalid manifest file format.
+Note that if your app has any errors, or produces any console output of its own,
+this will also appear in the upper part of the manifest. You may need to edit
+the file manually to remove that, otherwise you'll probably end up with an
+invalid manifest file format.
