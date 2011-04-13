@@ -11,7 +11,7 @@ For example...
 
     > phantomjs confess.js http://functionsource.com
 
-...will write, to stdoud:
+...will write, to stdout:
 
     CACHE MANIFEST
 
