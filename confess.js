@@ -78,10 +78,7 @@ var confess = {
                 foreach (properties, function(property) {
                     var value = rule.style.getPropertyCSSValue(property);
                     if (value && value.primitiveType == CSSPrimitiveValue.CSS_URI) {
-                        var url = value.getStringValue();
-                        if (url.substr(0,5)!='data:') {
-                            this.tallyResource(resources, url, baseScheme);
-                        }
+                        this.tallyResource(resources, value.getStringValue(), baseScheme);
                     }
                 }, this);
             }, this);
@@ -92,7 +89,7 @@ var confess = {
     },
 
     tallyResource: function (resources, url, baseScheme) {
-        if (url) {
+        if (url && url.substr(0,5)!='data:') {
             if (url.substr(0, 2)=='//') {
                 url = baseScheme + url;
             }

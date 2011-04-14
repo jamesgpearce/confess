@@ -78,6 +78,9 @@ PhantomJS' WebKit string. <code>TASK</code> is the type of analysis you'd like
 confess.js to perform, but right now it can only be <code>'manifest'</code>, the
 default.
 
+This loads the page, then searches the DOM (and the CSS) for references to any
+external resources that the app needs.
+
 The results go to stdout, but of course you can pipe it to a file. If you want
 to create a cache manifest for an app, this is typically called
 <code>app.manifest</code>:
