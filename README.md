@@ -82,16 +82,16 @@ This loads the page, then searches the DOM (and the CSS) for references to any
 external resources that the app needs.
 
 The results go to stdout, but of course you can pipe it to a file. If you want
-to create a cache manifest for an app, this is typically called
-<code>app.manifest</code>:
+to create a cache manifest for an app, this is my be called something like
+<code>my.appcache</code>:
 
-    > phantomjs confess.js http://functionsource.com > app.manifest
+    > phantomjs confess.js http://functionsource.com > my.appcache
 
 You would then need to attach add this file to your app, and reference the
 manifest in the <code>html</code> element:
 
     <!DOCTYPE html>
-    <html manifest="app.manifest">
+    <html manifest="my.appcache">
         <head>
 
 (And ensure that the manifest file gets emitted from your web server with a
