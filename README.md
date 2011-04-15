@@ -100,4 +100,5 @@ content type of <code>text/cache-manifest</code>.)
 Note that if your app has any errors, or produces any console output of its own,
 this will also appear in the upper part of the manifest. You may need to edit
 the file manually to remove that, otherwise you'll probably end up with an
-invalid manifest file format.
+invalid manifest file format. (You might also like to check it against Frederic
+Hemberger's great [cache manifest validator](http://manifest-validator.com/).)
