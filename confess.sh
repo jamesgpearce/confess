@@ -10,6 +10,6 @@ else
     if [ -f CONFESS ]; then
         echo "Error: can't find confess.js!"
     else
-        $PHANTOMJS $CONFESS $1 $2 $3
+        $PHANTOMJS $CONFESS $1 $2 $3 | sed '/\[Start of console output\]/,/\[End of console output\]/ d' | grep -v "Any console output"
     fi
 fi
