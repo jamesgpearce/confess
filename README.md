@@ -9,7 +9,7 @@ useful that, right now, that's the only behavior.
 
 For example...
 
-    > phantomjs confess.js http://functionsource.com
+    > confess.sh http://functionsource.com
 
 ...will write, to stdout:
 
@@ -68,9 +68,9 @@ The one and only dependency is [PhantomJS](http://www.phantomjs.org/). Install
 this, and ensure it's all good by trying out some of its example scripts.
 
 Then, assuming <code>phantomjs</code> is on your path, and from the directory
-containing <code>confess.js</code>, run tasks with:
+containing <code>confess.sh</code>, run tasks with:
 
-    > phantomjs confess.js URL [UA [TASK]]
+    > confess.sh URL [UA [TASK]]
 
 Where <code>URL</code> is mandatory, and points to the app you're analyzing.
 <code>UA</code> is the user-agent you'd like to use, and which defaults to
@@ -85,7 +85,7 @@ The results go to stdout, but of course you can pipe it to a file. If you want
 to create a cache manifest for an app, this is my be called something like
 <code>my.appcache</code>:
 
-    > phantomjs confess.js http://functionsource.com > my.appcache
+    > confess.sh http://functionsource.com > my.appcache
 
 You would then need to attach add this file to your app, and reference the
 manifest in the <code>html</code> element:
