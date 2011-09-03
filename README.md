@@ -88,4 +88,4 @@ manifest in the <code>html</code> element:
 content type of <code>text/cache-manifest</code>.)
 
 To check the resulting manifest's syntax, you might like to use Frederic
-Hemberger's great [cache manifest validator](http://manifest-validator.com/).)
+Hemberger's great [cache manifest validator](http://manifest-validator.com/).
