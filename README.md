@@ -72,7 +72,7 @@ This loads the page, then searches the DOM (and the CSS) for references to any
 external resources that the app needs.
 
 The results go to stdout, but of course you can pipe it to a file. If you want
-to create a cache manifest for an app, this is my be called something like
+to create a cache manifest for an app, this might be called something like
 <code>my.appcache</code>:
 
     > phantomjs confess.js http://functionsource.com > my.appcache
