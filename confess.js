@@ -31,7 +31,7 @@ var confess = {
                 return;
             }
 
-            var key, url,
+            var key, key2, url,
                 neverMatch = "(?!a)a",
                 cacheRegex = new RegExp(config.appcache.cacheFilter || neverMatch),
                 networkRegex = new RegExp(config.appcache.networkFilter || neverMatch);
@@ -45,7 +45,14 @@ var confess = {
             console.log('#');
             console.log('# Config:');
             for (key in config) {
-                console.log('#  ' + key + ': ' + config[key]);
+                if (config[key].constructor === Object) {
+                    console.log('#  ' + key + ':');
+                    for (key2 in config[key]) {
+                        console.log('#   ' + key2 + ': ' + config[key][key2]);
+                    }
+                } else {
+                    console.log('#  ' + key + ': ' + config[key]);
+                }
             }
             console.log('\nCACHE:');
             for (url in this.getResourceUrls(page)) {
