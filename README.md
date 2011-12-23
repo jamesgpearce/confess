@@ -112,12 +112,14 @@ The following is the default <code>config.json</code> file, but you can of
 course alter any of the values in this file, or a new config file of your own.
 
     {
-        "task": "manifest",
+        "task": "appcache",
         "userAgent": "default",
         "wait": 0,
         "consolePrefix": "#",
-        "cacheFilter": ".*",
-        "networkFilter": null
+        "appcache": {
+            "cacheFilter": ".*",
+            "networkFilter": null
+        }
     }
 
 These properties are used as follows:
@@ -130,8 +132,8 @@ These properties are used as follows:
 
  * <code>consolePrefix</code> - if set, confess.js will output the *browser's* console to the standard output. Useful for detecting if there are also any issues with the app's execution itself.
 
- * <code>cacheFilter</code> - a regex to indicate which files to include in the <code>CACHE</code> block of the manifest. If set to <code>null</code>, none will. As a better example, <code>\\\\.png$</code> will indicate that only PNG files should be cached. (Note the double escaping: once for the regex, and once for the JSON.)
+ * <code>appcache.cacheFilter</code> - a regex to indicate which files to include in the <code>CACHE</code> block of the manifest. If set to <code>null</code>, none will. As a better example, <code>\\\\.png$</code> will indicate that only PNG files should be cached. (Note the double escaping: once for the regex, and once for the JSON.)
 
- * <code>networkFilter</code> - a regex to indicate which files *not* to include in the <code>CACHE</code> block of the manifest, and which a browser will request from the network. If set to <code>null</code>, none will. Note that matching files will *not* be explicitly listed in the <code>NETWORK</code> block of the manifest, since there is always a catch-all <code>*</code> wildcard added.
+ * <code>appcache.networkFilter</code> - a regex to indicate which files *not* to include in the <code>CACHE</code> block of the manifest, and which a browser will request from the network. If set to <code>null</code>, none will. Note that matching files will *not* be explicitly listed in the <code>NETWORK</code> block of the manifest, since there is always a catch-all <code>*</code> wildcard added.
 
 

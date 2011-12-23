@@ -1,8 +1,10 @@
 {
-  "task": "manifest",
+  "task": "appcache",
   "userAgent": "default",
   "wait": 0,
   "consolePrefix": "#",
-  "cacheFilter": ".*",
-  "networkFilter": null
+  "appcache": {
+    "cacheFilter": ".*",
+    "networkFilter": null
+  }
 }

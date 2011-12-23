@@ -23,7 +23,7 @@ var confess = {
         );
     },
 
-    manifest: {
+    appcache: {
         pre: function (page, config) { },
         post: function (page, status, config) {
             if (status!='success') {
@@ -33,8 +33,8 @@ var confess = {
 
             var key, url,
                 neverMatch = "(?!a)a",
-                cacheRegex = new RegExp(config.cacheFilter || neverMatch),
-                networkRegex = new RegExp(config.networkFilter || neverMatch);
+                cacheRegex = new RegExp(config.appcache.cacheFilter || neverMatch),
+                networkRegex = new RegExp(config.appcache.networkFilter || neverMatch);
 
             console.log('CACHE MANIFEST\n');
             console.log('# This manifest was created by confess.js, http://github.com/jamesgpearce/confess');
