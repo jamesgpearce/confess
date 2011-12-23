@@ -1,0 +1,8 @@
+{
+  "task": "manifest",
+  "userAgent": "default",
+  "wait": 0,
+  "consolePrefix": "#",
+  "cacheFilter": "\\.png$",
+  "networkFilter": null
+}
