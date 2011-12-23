@@ -117,6 +117,7 @@ course alter any of the values in this file, or a new config file of your own.
         "wait": 0,
         "consolePrefix": "#",
         "appcache": {
+            "verbose": true,
             "cacheFilter": ".*",
             "networkFilter": null
         }
@@ -131,6 +132,8 @@ These properties are used as follows:
  * <code>wait</code> - the number of milliseconds to wait after the document has loaded before parsing for resources. This might be useful if you know that a deferred script might be making relevant additions to the DOM.
 
  * <code>consolePrefix</code> - if set, confess.js will output the *browser's* console to the standard output. Useful for detecting if there are also any issues with the app's execution itself.
+
+ * <code>appcache.verbose</code> - whether to add extra output about the generator's configuration into the manifest.
 
  * <code>appcache.cacheFilter</code> - a regex to indicate which files to include in the <code>CACHE</code> block of the manifest. If set to <code>null</code>, none will. As a better example, <code>\\\\.png$</code> will indicate that only PNG files should be cached. (Note the double escaping: once for the regex, and once for the JSON.)
 

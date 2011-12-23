@@ -37,21 +37,23 @@ var confess = {
                 networkRegex = new RegExp(config.appcache.networkFilter || neverMatch);
 
             console.log('CACHE MANIFEST\n');
-            console.log('# This manifest was created by confess.js, http://github.com/jamesgpearce/confess');
-            console.log('#');
             console.log('# Time: ' + new Date());
-            console.log('# Retrieved URL: ' + this.getFinalUrl(page));
-            console.log('# User-agent: ' + page.settings.userAgent);
-            console.log('#');
-            console.log('# Config:');
-            for (key in config) {
-                if (config[key].constructor === Object) {
-                    console.log('#  ' + key + ':');
-                    for (key2 in config[key]) {
-                        console.log('#   ' + key2 + ': ' + config[key][key2]);
+            if (config.appcache.verbose) {
+                console.log('# This manifest was created by confess.js, http://github.com/jamesgpearce/confess');
+                console.log('#');
+                console.log('# Retrieved URL: ' + this.getFinalUrl(page));
+                console.log('# User-agent: ' + page.settings.userAgent);
+                console.log('#');
+                console.log('# Config:');
+                for (key in config) {
+                    if (config[key].constructor === Object) {
+                        console.log('#  ' + key + ':');
+                        for (key2 in config[key]) {
+                            console.log('#   ' + key2 + ': ' + config[key][key2]);
+                        }
+                    } else {
+                        console.log('#  ' + key + ': ' + config[key]);
                     }
-                } else {
-                    console.log('#  ' + key + ': ' + config[key]);
                 }
             }
             console.log('\nCACHE:');
@@ -82,12 +84,6 @@ var confess = {
                     ['link[rel="stylesheet"]', 'href']
                 ],
 
-                // resources referenced in CSS
-                properties = [
-                    'background-image',
-                    'list-style-image',
-                ],
-
                 resources = {},
                 baseScheme = document.location.toString().split("//")[0],
                 tallyResource = function (url) {
@@ -103,8 +99,9 @@ var confess = {
                 },
 
                 elements, elementsLength, e,
-                stylesheets, stylesheetsLength, s,
+                stylesheets, stylesheetsLength, ss,
                 rules, rulesLength, r,
+                style, styleLength, s,
                 computed, computedLength, c,
                 value;
 
@@ -118,17 +115,18 @@ var confess = {
 
             // URLs in stylesheets
             stylesheets = document.styleSheets;
-            for (s = 0, stylesheetsLength = stylesheets.length; s < stylesheetsLength; s++) {
-                rules = stylesheets[s].rules;
+            for (ss = 0, stylesheetsLength = stylesheets.length; ss < stylesheetsLength; ss++) {
+                rules = stylesheets[ss].rules;
                 if (!rules) { continue; }
                 for (r = 0, rulesLength = rules.length; r < rulesLength; r++) {
                     if (!rules[r]['style']) { continue; }
-                    properties.forEach(function(property) {
-                        value = rules[r].style.getPropertyCSSValue(property);
+                    style = rules[r].style;
+                    for (s = 0, styleLength = style.length; s < styleLength; s++) {
+                        value = style.getPropertyCSSValue(style[s]);
                         if (value && value.primitiveType == CSSPrimitiveValue.CSS_URI) {
                             tallyResource(value.getStringValue());
                         }
-                    });
+                    }
                 };
             };
 

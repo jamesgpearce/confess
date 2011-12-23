@@ -4,6 +4,7 @@
   "wait": 0,
   "consolePrefix": "#",
   "appcache": {
+    "verbose": true,
     "cacheFilter": ".*",
     "networkFilter": null
   }
