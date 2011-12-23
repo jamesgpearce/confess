@@ -65,7 +65,7 @@ to request the page, in case you're serving mobile apps off similar entry-point
 URLs to your desktop content.
 
 Similarly, you can use filters to indicate which files should be included or
-excluded from the generated CACHE list.
+excluded from the generated <code>CACHE</code> list.
 
 ## Installation & usage
 
@@ -120,18 +120,18 @@ course alter any of the values in this file, or a new config file of your own.
         "networkFilter": null
     }
 
-The properties are defined as follows:
+These properties are used as follows:
 
- * <code>task</code> - the type of task you want confess.js to perform. "manifest" is the only supported value
+ * <code>task</code> - the type of task you want confess.js to perform. <code>appcache</code> is the only supported value
 
- * <code>userAgent</code> - the user-agent to make the request as, or "default" to use Phantom's usual user-agent string
+ * <code>userAgent</code> - the user-agent to make the request as, or <code>default</code> to use Phantom's usual user-agent string
 
  * <code>wait</code> - the number of milliseconds to wait after the document has loaded before parsing for resources. This might be useful if you know that a deferred script might be making relevant additions to the DOM.
 
  * <code>consolePrefix</code> - if set, confess.js will output the *browser's* console to the standard output. Useful for detecting if there are also any issues with the app's execution itself.
 
- * <code>cacheFilter</code> - a regex to indicate which files to include in the <code>CACHE</code> block of the manifest. If set to <code>null</code>, none will. As a better example, "<code>\\.png$</code>" will indicate that only PNG files should be cached. (Note the double escaping: once for the regex, and once for the JSON.)
+ * <code>cacheFilter</code> - a regex to indicate which files to include in the <code>CACHE</code> block of the manifest. If set to <code>null</code>, none will. As a better example, <code>\\\\.png$</code> will indicate that only PNG files should be cached. (Note the double escaping: once for the regex, and once for the JSON.)
 
  * <code>networkFilter</code> - a regex to indicate which files *not* to include in the <code>CACHE</code> block of the manifest, and which a browser will request from the network. If set to <code>null</code>, none will. Note that matching files will *not* be explicitly listed in the <code>NETWORK</code> block of the manifest, since there is always a catch-all <code>*</code> wildcard added.
 
- 
+

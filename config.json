@@ -3,6 +3,6 @@
   "userAgent": "default",
   "wait": 0,
   "consolePrefix": "#",
-  "cacheFilter": "\\.png$",
+  "cacheFilter": ".*",
   "networkFilter": null
 }
