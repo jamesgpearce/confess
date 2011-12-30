@@ -1,8 +1,13 @@
 # confess.js
 
-A small script library that uses [PhantomJS 1.2](http://www.phantomjs.org/) (or later) to headlessly analyze web pages.
+A small script library that uses [PhantomJS 1.2](http://www.phantomjs.org/) (or later) to headlessly analyze web pages. Currently it performs two tasks:
 
-One useful application of this is to enumerate a web app's resources for the purposes of creating a cache manifest file to make your apps run offline:
+ * Generation of an *appcache* manifest for a web app
+ * Simple *performance* analysis of a web page and its resources
+
+## Examples
+
+confess.js can enumerate a web app's resources for the purposes of creating a cache manifest file to make your apps run offline.
 
 For example...
 
@@ -44,7 +49,7 @@ For example...
     NETWORK:
     *
 
-Another useful trick is to be able to do a simple performance analysis of a site:
+The other thing it can do is generate a simple performance analysis of a site:
 
     > phantomjs confess.js http://functionsource.com performance
 
@@ -87,7 +92,7 @@ Another useful trick is to be able to do a simple performance analysis of a site
     10:    317ms;    5165b; http://functionsource.com/...tars/dion.png
     ...
 
-As well as using the final command line argument to perform different tasks, you can use the local config.json file, to affect the behavior of the way in which confess.js runs.
+As well as using the final command line argument to perform different tasks, you can use the local <code>config.json</code> file to affect the behavior of the way in which confess.js runs.
 
 For example, you can set the user-agent header of the request made by PhantomJS to request the page, in case you're serving mobile apps off similar entry-point URLs to your desktop content.
 
@@ -95,7 +100,7 @@ Similarly, if you're creating an appcache manifest, you can use filters to indic
 
 ## Installation & usage
 
-The one and only dependency is [PhantomJS](http://www.phantomjs.org/), version 1.2 or later. Install this, and ensure it's all good by trying out some of its example scripts.
+The one-and-only dependency is the one-and-only [PhantomJS](http://www.phantomjs.org/), version 1.2 or later. Install this, and ensure it's all good by trying out some of its example scripts.
 
 Then, assuming <code>phantomjs</code> is on your path, and from the directory containing <code>confess.js</code> and <code>config.json</code>, run the tasks with:
 
