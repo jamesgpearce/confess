@@ -2,30 +2,127 @@ var fs = require('fs');
 var confess = {
 
     run: function () {
-
         var cliConfig = {};
-        if (!this.utils.processArgs(cliConfig, [
+        if (!this.processArgs(cliConfig, [
             {name:'url', def:"http://google.com", req:true, desc:"the URL of the app to cache"},
+            {name:'task', def:"appcache", req:false, desc:"the task to perform"},
             {name:'configFile', def:"config.json", req:false, desc:"a local configuration file of further confess settings"},
         ])) {
             phantom.exit();
             return;
         }
-        this.config = this.utils.mergeConfig(cliConfig, cliConfig.configFile);
-
+        this.config = this.mergeConfig(cliConfig, cliConfig.configFile);
         var task = this[this.config.task];
+        this.load(this.config, task, this);
+    },
 
-        this.utils.load(
-            this.config,
-            task.pre,
-            task.post,
-            this
-        );
+    performance: {
+        resources: [],
+        onLoadStarted: function (page, config) {
+            if (!this.performance.start) {
+                this.performance.start = new Date().getTime();
+            }
+        },
+        onResourceRequested: function (page, config, request) {
+            var start = new Date().getTime();
+            this.performance.resources[request.id] = {
+                start: start,
+                request: request
+            }
+            if (!this.performance.start || start < this.performance.start) {
+                this.performance.start = start;
+            }
+        },
+        onResourceReceived: function (page, config, response) {
+            var finish = new Date().getTime(),
+                resource = this.performance.resources[response.id];
+            resource.response = response;
+            resource.finish = finish;
+        },
+        onLoadFinished: function (page, config, status) {
+            var start = this.performance.start,
+                finish =  new Date().getTime(),
+                resources = this.performance.resources,
+                slowest, fastest, totalDuration = 0,
+                largest, smallest, totalSize = 0,
+                missingSize = false,
+                elapsed = finish - start;
+
+            resources.forEach(function (resource) {
+                resource.size = '-';
+                resource.response.headers.forEach(function (header) {
+                    if (header.name.toLowerCase()=='content-length') {
+                        resource.size = parseInt(header.value);
+                    }
+                });
+                resource.duration = resource.finish - resource.start;
+                resource.url = resource.response.url;
+
+                if (!slowest || resource.duration > slowest.duration) {
+                    slowest = resource;
+                }
+                if (!fastest || resource.duration < fastest.duration) {
+                    fastest = resource;
+                }
+                totalDuration += resource.duration;
+
+                if (resource.size!='-') {
+                    if (!largest || resource.size > largest.size) {
+                        largest = resource;
+                    }
+                    if (!smallest || resource.size < smallest.size) {
+                        smallest = resource;
+                    }
+                    totalSize += parseInt(resource.size);
+                } else {
+                    missingSize = true;
+                }
+            });
+
+            if (config.verbose) {
+                console.log('');
+                this.emitConfig(config, '');
+            }
+            console.log('');
+            console.log('Elapsed load time: ' + this.pad(elapsed, 6) + 'ms');
+            console.log('   # of resources: ' + this.pad(resources.length-1, 8));
+            console.log('');
+            console.log(' Fastest resource: ' + this.pad(fastest.duration, 6) + 'ms; ' + this.truncate(fastest.url));
+            console.log(' Slowest resource: ' + this.pad(slowest.duration, 6) + 'ms; ' + this.truncate(slowest.url));
+            console.log('  Total resources: ' + this.pad(totalDuration, 6) + 'ms');
+            console.log('');
+            console.log('Smallest resource: ' + this.pad(smallest.size, 7) + 'b; ' + this.truncate(smallest.url));
+            console.log(' Largest resource: ' + this.pad(largest.size, 7) + 'b; ' + this.truncate(largest.url));
+            console.log('  Total resources: ' + this.pad(totalSize, 7) + 'b' + (missingSize ? '; (at least)' : ''));
+            if (config.verbose) {
+                    var ths = this,
+                    bar;
+                console.log('');
+                resources.forEach(function (resource, i) {
+                    bar = ths.gantt(resource.start - start, resource.finish - start, elapsed, 104);
+                    console.log(ths.pad(i, 3) + '|' + bar + '|');
+                });
+                console.log('');
+                resources.forEach(function (resource, i) {
+                    console.log(
+                        ths.pad(i, 3) + ': ' +
+                        ths.pad(resource.duration, 6) + 'ms; ' +
+                        ths.pad(resource.size, 7) + 'b; ' +
+                        ths.truncate(resource.url, 84)
+                    );
+                });
+            }
+        }
     },
 
     appcache: {
-        pre: function (page, config) { },
-        post: function (page, status, config) {
+        resourceUrls: {},
+        onResourceRequested: function (page, config, request) {
+            if (config.appcache.urlsFromRequests) {
+                this.appcache.resourceUrls[request.url] = true;
+            }
+        },
+        onLoadFinished: function (page, config, status) {
             if (status!='success') {
                 console.log('# FAILED TO LOAD');
                 return;
@@ -36,44 +133,43 @@ var confess = {
                 cacheRegex = new RegExp(config.appcache.cacheFilter || neverMatch),
                 networkRegex = new RegExp(config.appcache.networkFilter || neverMatch);
 
-            console.log('CACHE MANIFEST\n');
+            console.log('CACHE MANIFEST');
+            console.log('');
             console.log('# Time: ' + new Date());
-            if (config.appcache.verbose) {
+            if (config.verbose) {
                 console.log('# This manifest was created by confess.js, http://github.com/jamesgpearce/confess');
                 console.log('#');
                 console.log('# Retrieved URL: ' + this.getFinalUrl(page));
                 console.log('# User-agent: ' + page.settings.userAgent);
                 console.log('#');
-                console.log('# Config:');
-                for (key in config) {
-                    if (config[key].constructor === Object) {
-                        console.log('#  ' + key + ':');
-                        for (key2 in config[key]) {
-                            console.log('#   ' + key2 + ': ' + config[key][key2]);
-                        }
-                    } else {
-                        console.log('#  ' + key + ': ' + config[key]);
-                    }
+                this.emitConfig(config, '# ');
+            }
+            console.log('');
+            console.log('CACHE:');
+
+            if (config.appcache.urlsFromDocument) {
+                for (url in this.getResourceUrls(page)) {
+                    this.appcache.resourceUrls[url] = true;
                 }
             }
-            console.log('\nCACHE:');
-            for (url in this.getResourceUrls(page)) {
+            for (url in this.appcache.resourceUrls) {
                 if (cacheRegex.test(url) && !networkRegex.test(url)) {
                     console.log(url);
                 }
             };
-            console.log('\nNETWORK:\n*');
+            console.log('');
+            console.log('NETWORK:');
+            console.log('*');
         }
     },
 
-    getFinalUrl: function (page, config) {
+    getFinalUrl: function (page) {
         return page.evaluate(function () {
             return document.location.toString();
         });
     },
 
-    getResourceUrls: function (page, status, config) {
-
+    getResourceUrls: function (page) {
         return page.evaluate(function () {
             var
                 // resources referenced in DOM
@@ -146,70 +242,125 @@ var confess = {
         });
     },
 
-
-    utils: {
-
-        load: function (config, pre, post, scope) {
-            var page = new WebPage();
-            if (config.consolePrefix) {
-                page.onConsoleMessage = function (msg, line, src) {
-                    console.log(config.consolePrefix + ' ' + msg + ' (' + src + ', #' + line + ')');
+    emitConfig: function (config, prefix) {
+        console.log(prefix + 'Config:');
+        for (key in config) {
+           if (config[key].constructor === Object) {
+                if (key===config.task) {
+                    console.log(prefix + ' ' + key + ':');
+                    for (key2 in config[key]) {
+                        console.log(prefix + '  ' + key2 + ': ' + config[key][key2]);
+                    }
                 }
+           } else {
+               console.log(prefix + ' ' + key + ': ' + config[key]);
+           }
+       }
+    },
+
+    load: function (config, task, scope) {
+        var page = new WebPage(),
+            event;
+        if (config.consolePrefix) {
+            page.onConsoleMessage = function (msg, line, src) {
+                console.log(config.consolePrefix + ' ' + msg + ' (' + src + ', #' + line + ')');
             }
-            page.onLoadStarted = function () {
-                pre.call(scope, page, config);
-            };
+        }
+        if (config.userAgent && config.userAgent != "default") {
+            page.settings.userAgent = config.userAgent;
+        }
+        ['onInitialized', 'onLoadStarted', 'onResourceRequested', 'onResourceReceived']
+        .forEach(function (event) {
+            if (task[event]) {
+                page[event] = function () {
+                    var args = [page, config],
+                        a, aL;
+                    for (a = 0, aL = arguments.length; a < aL; a++) {
+                        args.push(arguments[a]);
+                    }
+                    task[event].apply(scope, args);
+                };
+            }
+        });
+        if (task.onLoadFinished) {
             page.onLoadFinished = function (status) {
                 if (config.wait) {
                     setTimeout(
                         function () {
-                            post.call(scope, page, status, config);
+                            task.onLoadFinished.call(scope, page, config, status);
                             phantom.exit();
                         },
                         config.wait
                     );
                 } else {
-                    post.call(scope, page, status, config);
+                    task.onLoadFinished.call(scope, page, config, status);
                     phantom.exit();
                 }
             };
-            if (config.userAgent && config.userAgent != "default") {
-                page.settings.userAgent = config.userAgent;
-            }
-            page.open(config.url);
-        },
-
-        processArgs: function (config, contract) {
-            var a = 0;
-            var ok = true;
-            contract.forEach(function(argument) {
-                if (a < phantom.args.length) {
-                    config[argument.name] = phantom.args[a];
-                } else {
-                    if (argument.req) {
-                        console.log('"' + argument.name + '" argument is required. This ' + argument.desc + '.');
-                        ok = false;
-                    } else {
-                        config[argument.name] = argument.def;
-                    }
-                }
-                a++;
-            });
-            return ok;
-        },
-
-        mergeConfig: function (config, configFile) {
-            if (!fs.exists(configFile)) {
-               configFile = "config.json";
-            }
-            var result = JSON.parse(fs.read(configFile)),
-                key;
-            for (key in config) {
-                result[key] = config[key];
-            }
-            return result;
         }
+        page.open(config.url);
+    },
 
+    processArgs: function (config, contract) {
+        var a = 0;
+        var ok = true;
+        contract.forEach(function(argument) {
+            if (a < phantom.args.length) {
+                config[argument.name] = phantom.args[a];
+            } else {
+                if (argument.req) {
+                    console.log('"' + argument.name + '" argument is required. This ' + argument.desc + '.');
+                    ok = false;
+                } else {
+                    config[argument.name] = argument.def;
+                }
+            }
+            a++;
+        });
+        return ok;
+    },
+
+    mergeConfig: function (config, configFile) {
+        if (!fs.exists(configFile)) {
+           configFile = "config.json";
+        }
+        var result = JSON.parse(fs.read(configFile)),
+            key;
+        for (key in config) {
+            result[key] = config[key];
+        }
+        return result;
+    },
+
+    truncate: function (str, length) {
+        length = length || 80;
+        if (str.length <= length) {
+            return str;
+        }
+        var half = length / 2;
+        return str.substr(0, half-2) + '...' + str.substr(str.length-half+1);
+    },
+
+    pad: function (str, length) {
+        var padded = str.toString();
+        if (padded.length > length) {
+            return this.pad(padded, length * 2);
+        }
+        return this.repeat(' ', length - padded.length) + padded;
+    },
+
+    repeat: function (chr, length) {
+        for (var str = '', l = 0; l < length; l++) {
+            str += chr;
+        }
+        return str;
+    },
+
+    gantt: function (min, max, range, length) {
+        length = length || 80;
+        var ratio = length / range,
+            str = this.repeat(' ', min * ratio) + this.repeat('-', (max - min) * ratio);
+        return str.substr(0, length) + this.repeat(' ', length - str.length);
     }
 
 }

@@ -3,8 +3,10 @@
   "userAgent": "default",
   "wait": 0,
   "consolePrefix": "#",
+  "verbose": true,
   "appcache": {
-    "verbose": true,
+    "urlsFromDocument": true,
+    "urlsFromRequests": false,
     "cacheFilter": ".*",
     "networkFilter": null
   }
