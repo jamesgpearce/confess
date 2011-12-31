@@ -79,27 +79,27 @@ The other thing it can do is generate a simple performance analysis of a site:
 
 ...and which can also generate an ASCII-art waterfall of the waits and receipts of each requested resource:
 
-  1|---------------------=                                           |
-  2|                     ----------                                  |
-  3|                     ---=                                        |
-  4|                     --------=                                   |
-  5|                     ---------=                                  |
-  6|                     -----------                                 |
-  7|                     -------                                     |
-  8|                              -----------=========               |
-  9|                              ---======                          |
- 10|                               ----==                            |
+     1|---------------------=                                           |
+     2|                     ----------                                  |
+     3|                     ---=                                        |
+     4|                     --------=                                   |
+     5|                     ---------=                                  |
+     6|                     -----------                                 |
+     7|                     -------                                     |
+     8|                              -----------=========               |
+     9|                              ---======                          |
+    10|                               ----==                            |
 
-  1:    577ms;   17669b; http://functionsource.com/
-  2:    255ms;   24990b; http://use.typekit.com/tqz3zpc.js
-  3:     59ms;    1733b; http://functionsource.com/...ts/lib/legacy.js
-  4:    216ms;    5291b; http://functionsource.com/...sheets/light.css
-  5:    240ms;    4150b; http://functionsource.com/...heets/syntax.css
-  6:    283ms;   12049b; http://functionsource.com/...heets/screen.css
-  7:    176ms;   32614b; http://www.google-analytics.com/ga.js
-  8:    537ms;    1448b; http://functionscopedev.files.wordpress.com..
-  9:    228ms;    5792b; http://functionsource.com/...cons/netflix.png
- 10:    134ms;    1153b; http://functionsource.com/...avatars/dion.png
+     1:    577ms;   17669b; http://functionsource.com/
+     2:    255ms;   24990b; http://use.typekit.com/tqz3zpc.js
+     3:     59ms;    1733b; http://functionsource.com/...ts/lib/legacy.js
+     4:    216ms;    5291b; http://functionsource.com/...sheets/light.css
+     5:    240ms;    4150b; http://functionsource.com/...heets/syntax.css
+     6:    283ms;   12049b; http://functionsource.com/...heets/screen.css
+     7:    176ms;   32614b; http://www.google-analytics.com/ga.js
+     8:    537ms;    1448b; http://functionscopedev.files.wordpress.com..
+     9:    228ms;    5792b; http://functionsource.com/...cons/netflix.png
+    10:    134ms;    1153b; http://functionsource.com/...avatars/dion.png
 
 As well as using the final command line argument to perform different tasks, you can use the local <code>config.json</code> file to affect the behavior of the way in which confess.js runs.
 
