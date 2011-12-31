@@ -66,31 +66,40 @@ The other thing it can do is generate a simple performance analysis of a site:
      Largest resource:   40183b; http://functionsource.com/...ader.png
       Total resources:  107594b; (at least)
 
-...and which can also generate an ASCII-art waterfall:
+    Elapsed load time:   2927ms
+       # of resources:       21
 
-     1|-------------------                                           |
-     2|                   ------                                     |
-     3|                   ---                                        |
-     4|                   --------                                   |
-     5|                   -------                                    |
-     6|                   --------                                   |
-     7|                   ------------                               |
-     8|                         -------------------                  |
-     9|                         ------------------                   |
-    10|                          ------                              |
-    ...
+     Fastest resource:     59ms; http://functionsource.com/...egacy.js
+     Slowest resource:   1306ms; http://use.typekit.com/...78ed8d47e4b
+      Total resources:   7573ms
 
-     1:   1126ms;       -b; http://functionsource.com/
-     2:    343ms;       -b; http://use.typekit.com/tqz3zpc.js
-     3:    147ms;       -b; http://functionsource.com/...lib/legacy.js
-     4:    438ms;       -b; http://functionsource.com/...ts/screen.css
-     5:    400ms;       -b; http://functionsource.com/...ts/syntax.css
-     6:    452ms;       -b; http://functionsource.com/...ets/light.css
-     7:    680ms;       -b; http://www.google-analytics.com/ga.js
-     8:   1142ms;   23557b; http://functionscopedev.files.wordpress...
-     9:   1073ms;   17200b; http://functionsource.com/...s/netflix.png
-    10:    317ms;    5165b; http://functionsource.com/...tars/dion.png
-    ...
+    Smallest resource:      35b; http://www.google-analytics.com/...q~
+     Largest resource:   32614b; http://www.google-analytics.com/ga.js
+      Total resources:  149860b
+
+...and which can also generate an ASCII-art waterfall of the waits and receipts of each requested resource:
+
+  1|---------------------=                                           |
+  2|                     ----------                                  |
+  3|                     ---=                                        |
+  4|                     --------=                                   |
+  5|                     ---------=                                  |
+  6|                     -----------                                 |
+  7|                     -------                                     |
+  8|                              -----------=========               |
+  9|                              ---======                          |
+ 10|                               ----==                            |
+
+  1:    577ms;   17669b; http://functionsource.com/
+  2:    255ms;   24990b; http://use.typekit.com/tqz3zpc.js
+  3:     59ms;    1733b; http://functionsource.com/...ts/lib/legacy.js
+  4:    216ms;    5291b; http://functionsource.com/...sheets/light.css
+  5:    240ms;    4150b; http://functionsource.com/...heets/syntax.css
+  6:    283ms;   12049b; http://functionsource.com/...heets/screen.css
+  7:    176ms;   32614b; http://www.google-analytics.com/ga.js
+  8:    537ms;    1448b; http://functionscopedev.files.wordpress.com..
+  9:    228ms;    5792b; http://functionsource.com/...cons/netflix.png
+ 10:    134ms;    1153b; http://functionsource.com/...avatars/dion.png
 
 As well as using the final command line argument to perform different tasks, you can use the local <code>config.json</code> file to affect the behavior of the way in which confess.js runs.
 

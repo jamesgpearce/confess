@@ -24,20 +24,38 @@ var confess = {
             }
         },
         onResourceRequested: function (page, config, request) {
-            var start = new Date().getTime();
+            var now = new Date().getTime();
             this.performance.resources[request.id] = {
-                start: start,
-                request: request
-            }
-            if (!this.performance.start || start < this.performance.start) {
-                this.performance.start = start;
+                id: request.id,
+                url: request.url,
+                request: request,
+                responses: {},
+                duration: '-',
+                times: {
+                    request: now
+                }
+            };
+            if (!this.performance.start || now < this.performance.start) {
+                this.performance.start = now;
             }
         },
         onResourceReceived: function (page, config, response) {
-            var finish = new Date().getTime(),
+            var now = new Date().getTime(),
                 resource = this.performance.resources[response.id];
-            resource.response = response;
-            resource.finish = finish;
+            resource.responses[response.stage] = response;
+            if (!resource.times[response.stage]) {
+                resource.times[response.stage] = now;
+                resource.duration = now - resource.times.request;
+            }
+            if (response.bodySize) {
+                resource.size = response.bodySize;
+            } else if (!resource.size) {
+                response.headers.forEach(function (header) {
+                    if (header.name.toLowerCase()=='content-length') {
+                        resource.size = parseInt(header.value);
+                    }
+                });
+            }
         },
         onLoadFinished: function (page, config, status) {
             var start = this.performance.start,
@@ -49,15 +67,9 @@ var confess = {
                 elapsed = finish - start;
 
             resources.forEach(function (resource) {
-                resource.size = '-';
-                resource.response.headers.forEach(function (header) {
-                    if (header.name.toLowerCase()=='content-length') {
-                        resource.size = parseInt(header.value);
-                    }
-                });
-                resource.duration = resource.finish - resource.start;
-                resource.url = resource.response.url;
-
+                if (!resource.times.start) {
+                    resource.times.start = resource.times.end;
+                }
                 if (!slowest || resource.duration > slowest.duration) {
                     slowest = resource;
                 }
@@ -66,15 +78,16 @@ var confess = {
                 }
                 totalDuration += resource.duration;
 
-                if (resource.size!='-') {
+                if (resource.size) {
                     if (!largest || resource.size > largest.size) {
                         largest = resource;
                     }
                     if (!smallest || resource.size < smallest.size) {
                         smallest = resource;
                     }
-                    totalSize += parseInt(resource.size);
+                    totalSize += resource.size;
                 } else {
+                    resource.size = '-';
                     missingSize = true;
                 }
             });
@@ -95,17 +108,23 @@ var confess = {
             console.log(' Largest resource: ' + this.pad(largest.size, 7) + 'b; ' + this.truncate(largest.url));
             console.log('  Total resources: ' + this.pad(totalSize, 7) + 'b' + (missingSize ? '; (at least)' : ''));
             if (config.verbose) {
-                    var ths = this,
-                    bar;
                 console.log('');
-                resources.forEach(function (resource, i) {
-                    bar = ths.gantt(resource.start - start, resource.finish - start, elapsed, 104);
-                    console.log(ths.pad(i, 3) + '|' + bar + '|');
+                var ths = this,
+                    length = 104,
+                    ratio = length / elapsed,
+                    bar;
+                resources.forEach(function (resource) {
+                    bar = ths.repeat(' ', (resource.times.request - start) * ratio) +
+                          ths.repeat('-', (resource.times.start - resource.times.request) * ratio) +
+                          ths.repeat('=', (resource.times.end - resource.times.start) * ratio)
+                    ;
+                    bar = bar.substr(0, length) + ths.repeat(' ', length - bar.length);
+                    console.log(ths.pad(resource.id, 3) + '|' + bar + '|');
                 });
                 console.log('');
-                resources.forEach(function (resource, i) {
+                resources.forEach(function (resource) {
                     console.log(
-                        ths.pad(i, 3) + ': ' +
+                        ths.pad(resource.id, 3) + ': ' +
                         ths.pad(resource.duration, 6) + 'ms; ' +
                         ths.pad(resource.size, 7) + 'b; ' +
                         ths.truncate(resource.url, 84)
@@ -355,13 +374,6 @@ var confess = {
         }
         return str;
     },
-
-    gantt: function (min, max, range, length) {
-        length = length || 80;
-        var ratio = length / range,
-            str = this.repeat(' ', min * ratio) + this.repeat('-', (max - min) * ratio);
-        return str.substr(0, length) + this.repeat(' ', length - str.length);
-    }
 
 }
 
