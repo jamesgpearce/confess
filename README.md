@@ -89,6 +89,7 @@ The other thing it can do is generate a simple performance analysis of a site:
      8|                              -----------=========               |
      9|                              ---======                          |
     10|                               ----==                            |
+      ...
 
      1:    577ms;   17669b; http://functionsource.com/
      2:    255ms;   24990b; http://use.typekit.com/tqz3zpc.js
@@ -100,6 +101,7 @@ The other thing it can do is generate a simple performance analysis of a site:
      8:    537ms;    1448b; http://functionscopedev.files.wordpress.com..
      9:    228ms;    5792b; http://functionsource.com/...cons/netflix.png
     10:    134ms;    1153b; http://functionsource.com/...avatars/dion.png
+      ...
 
 As well as using the final command line argument to perform different tasks, you can use the local <code>config.json</code> file to affect the behavior of the way in which confess.js runs.
 
