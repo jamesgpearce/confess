@@ -4,9 +4,23 @@ var confess = {
     run: function () {
         var cliConfig = {};
         if (!this.processArgs(cliConfig, [
-            {name:'url', def:"http://google.com", req:true, desc:"the URL of the app to cache"},
-            {name:'task', def:"appcache", req:false, desc:"the task to perform"},
-            {name:'configFile', def:"config.json", req:false, desc:"a local configuration file of further confess settings"},
+            {
+                name: 'url',
+                def: 'http://google.com',
+                req: true,
+                desc: 'the URL of the app to cache'
+            }, {
+                name: 'task',
+                def: 'appcache',
+                req: false,
+                desc: 'the task to perform',
+                oneof: ['performance', 'appcache', 'cssproperties']
+            }, {
+                name: 'configFile',
+                def: 'config.json',
+                req: false,
+                desc: 'a local configuration file of further confess settings'
+            },
         ])) {
             phantom.exit();
             return;
@@ -182,6 +196,30 @@ var confess = {
         }
     },
 
+    cssproperties: {
+        resourceUrls: {},
+        onResourceRequested: function (page, config, request) {
+            if (config.appcache.urlsFromRequests) {
+                this.appcache.resourceUrls[request.url] = true;
+            }
+        },
+        onLoadFinished: function (page, config, status) {
+            if (status!='success') {
+                console.log('# FAILED TO LOAD');
+                return;
+            }
+            if (config.verbose) {
+                console.log('');
+                this.emitConfig(config, '');
+            }
+            console.log('');
+            console.log('CSS properties used:');
+            for (property in this.getCssProperties(page)) {
+                console.log(property);
+            }
+        }
+    },
+
     getFinalUrl: function (page) {
         return page.evaluate(function () {
             return document.location.toString();
@@ -261,6 +299,51 @@ var confess = {
         });
     },
 
+    getCssProperties: function (page) {
+        return page.evaluate(function () {
+            var properties = {},
+                tallyProperty = function (property) {
+                    if (!properties[property]) {
+                        properties[property] = 0;
+                    }
+                    properties[property]++;
+                },
+                stylesheets, stylesheetsLength, ss,
+                rules, rulesLength, r,
+                style, styleLength, s,
+                property;
+
+            // properties in stylesheets
+            stylesheets = document.styleSheets;
+            for (ss = 0, stylesheetsLength = stylesheets.length; ss < stylesheetsLength; ss++) {
+                rules = stylesheets[ss].rules;
+                if (!rules) { continue; }
+                for (r = 0, rulesLength = rules.length; r < rulesLength; r++) {
+                    if (!rules[r]['style']) { continue; }
+                    style = rules[r].style;
+                    for (s = 0, styleLength = style.length; s < styleLength; s++) {
+                        tallyProperty(style[s]);
+                    }
+                }
+            }
+
+            // properties in styles on DOM
+            elements = document.querySelectorAll('*');
+            for (e = 0, elementsLength = elements.length; e < elementsLength; e++) {
+                rules = elements[e].ownerDocument.defaultView.getMatchedCSSRules(elements[e], '');
+                if (!rules) { continue; }
+                for (r = 0, rulesLength = rules.length; r < rulesLength; r++) {
+                    if (!rules[r]['style']) { continue; }
+                    style = rules[r].style;
+                    for (s = 0, styleLength = style.length; s < styleLength; s++) {
+                        tallyProperty(style[s]);
+                    }
+                }
+            }
+            return properties;
+        });
+    },
+
     emitConfig: function (config, prefix) {
         console.log(prefix + 'Config:');
         for (key in config) {
@@ -286,6 +369,9 @@ var confess = {
             }
         }
         if (config.userAgent && config.userAgent != "default") {
+            if (config.userAgentAliases[config.userAgent]) {
+                config.userAgent = config.userAgentAliases[config.userAgent];
+            }
             page.settings.userAgent = config.userAgent;
         }
         ['onInitialized', 'onLoadStarted', 'onResourceRequested', 'onResourceReceived']
@@ -316,6 +402,10 @@ var confess = {
                     phantom.exit();
                 }
             };
+        } else {
+            page.onLoadFinished = function (status) {
+                phantom.exit();
+            }
         }
         page.open(config.url);
     },
@@ -333,6 +423,10 @@ var confess = {
                 } else {
                     config[argument.name] = argument.def;
                 }
+            }
+            if (argument.oneof && argument.oneof.indexOf(config[argument.name])==-1) {
+                console.log('"' + argument.name + '" argument must be one of: ' + argument.oneof.join(', '));
+                ok = false;
             }
             a++;
         });

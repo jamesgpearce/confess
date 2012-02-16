@@ -143,6 +143,11 @@ Using the <code>performance</code> task argument will get confess.js to load the
 
 It will list the fastest and slowest resources, and also the largest and smallest (subject to the availability of the <code>content-length</code> header). With the verbose configuration enabled, it will also list out all the resources loaded as part of the page, and display an ASCII-art waterfall chart of their timings.
 
+## The cssproperties task
+
+Using the <code>cssproperties</code> task argument will get confess.js to load the page, and then parse the styles in the DOM and CSSOM to identify which CSS properties are being used by the page.
+
+
 ## Configuration
 
 The following is the default <code>config.json</code> file for confess.js, but you can of course alter any of the values in this file, or a new config file of your own.
@@ -150,6 +155,11 @@ The following is the default <code>config.json</code> file for confess.js, but y
     {
         "task": "appcache",
         "userAgent": "default",
+        "userAgentAliases": {
+            "iphone": "Mozilla/5.0 (iPhone; ...",
+            "android": "Mozilla/5.0 (Linux; U; Android ...",
+            "chrome": "Mozilla/5.0 (Macintosh; Intel Mac OS X ..."
+        },
         "wait": 0,
         "consolePrefix": "#",
         "verbose": true,
@@ -163,9 +173,11 @@ The following is the default <code>config.json</code> file for confess.js, but y
 
 These properties are used as follows:
 
- * <code>task</code> - the default type of task you want confess.js to perform, if not specified on the command line. <code>appcache</code> and <code>performance</code> are the only supported values
+ * <code>task</code> - the default type of task you want confess.js to perform, if not specified on the command line. <code>appcache</code>, <code>performance</code>, and <code>cssproperties</code> are the supported values
 
  * <code>userAgent</code> - the user-agent to make the request as, or <code>default</code> to use PhantomJS's usual user-agent string
+
+ * <code>userAgentAliases</code> - common aliases for the userAgent setting. For example, you could use the setting <code>"userAgent": "iphone"</code> and it will resolve to the iPhone's full UA provided here.
 
  * <code>wait</code> - the number of milliseconds to wait after the document has loaded before parsing for resources. This might be useful if you know that a deferred script might be making relevant additions to the DOM.
 
