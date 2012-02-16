@@ -1,9 +1,10 @@
 # confess.js
 
-A small script library that uses [PhantomJS 1.2](http://www.phantomjs.org/) (or later) to headlessly analyze web pages. Currently it performs two tasks:
+A small script library that uses [PhantomJS 1.2](http://www.phantomjs.org/) (or later) to headlessly analyze web pages. Currently it can perform the following tasks:
 
  * Generation of an *appcache* manifest for a web app
  * Simple *performance* analysis of a web page and its resources
+ * List of *CSS properties* used on the page
 
 ## Examples
 
