@@ -90,7 +90,9 @@ var confess = {
                 if (!fastest || resource.duration < fastest.duration) {
                     fastest = resource;
                 }
-                totalDuration += resource.duration;
+                if (resource.duration != '-'){
+                    totalDuration += resource.duration;
+                }
 
                 if (resource.size) {
                     if (!largest || resource.size > largest.size) {
