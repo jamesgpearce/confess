@@ -3,7 +3,7 @@ var confess = {
 
     run: function () {
         var cliConfig = {};
-        if (!this.processArgs(cliConfig, [
+        var argsArray = [
             {
                 name: 'url',
                 def: 'http://google.com',
@@ -21,7 +21,16 @@ var confess = {
                 req: false,
                 desc: 'a local configuration file of further confess settings'
             },
-        ])) {
+        ]
+        if (typeof phantom.args == 'undefined') { 
+            // in phantom v2.0 the first argument is the scriptname
+            argsArray = [{
+                name: 'scriptname',
+                def: 'confess.js',
+                req: true,
+                desc: 'the name of this script'}].concat(argsArray);
+        }
+        if (!this.processArgs(cliConfig, argsArray)) {
             phantom.exit();
             return;
         }
@@ -414,8 +423,10 @@ var confess = {
         var a = 0;
         var ok = true;
         contract.forEach(function(argument) {
-            if (a < phantom.args.length) {
-                config[argument.name] = phantom.args[a];
+            // phantom v2.0 no longer supports phantom.args
+            var scriptobj = typeof phantom.args == 'undefined' ? require('system'): phantom;
+            if (a < scriptobj.args.length) {
+                config[argument.name] = scriptobj.args[a];
             } else {
                 if (argument.req) {
                     console.log('"' + argument.name + '" argument is required. This ' + argument.desc + '.');
