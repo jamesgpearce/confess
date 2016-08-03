@@ -411,11 +411,15 @@ var confess = {
     },
 
     processArgs: function (config, contract) {
-        var a = 0;
+        var a = 1;
         var ok = true;
         contract.forEach(function(argument) {
-            if (a < phantom.args.length) {
-                config[argument.name] = phantom.args[a];
+            // if (a < phantom.args.length) {
+            system = require('system');
+            args = system.args;
+            if (a < args.length) {
+                // config[argument.name] = phantom.args[a];
+                config[argument.name] = args[a];
             } else {
                 if (argument.req) {
                     console.log('"' + argument.name + '" argument is required. This ' + argument.desc + '.');
